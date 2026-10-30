@@ -1,0 +1,2 @@
+-- Se ejecuta únicamente la primera vez que se crea el volumen
+-- CREATE EXTENSION IF NOT EXISTS pgcrypto;
