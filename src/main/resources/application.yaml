@@ -1,3 +1,19 @@
 spring:
   application:
-    name: backend
+    name: soportehub-backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:${DB_PORT:5433}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: false
+
+server:
+  port: 8080
