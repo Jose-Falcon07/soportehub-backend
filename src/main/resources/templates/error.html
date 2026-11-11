@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{error.title})}"></head>
+<body>
+<main>
+  <div class="card">
+    <h1 th:text="#{error.title}"></h1>
+    <p><strong th:text="${status}"></strong></p>
+    <p th:text="${message}"></p>
+    <p><a th:href="@{/home}">Volver al inicio</a></p>
+  </div>
+</main>
+</body>
+</html>

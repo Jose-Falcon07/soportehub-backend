@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{invitation.title})}"></head>
+<body>
+<main>
+  <div class="card">
+    <h1 th:text="#{invitation.title}"></h1>
+    <p class="error" th:if="${error}" th:text="${error}"></p>
+    <form th:action="@{/invitation/{t}(t=${token})}" method="post">
+      <label th:text="#{invitation.password}"></label>
+      <input type="password" name="password" minlength="8" required>
+      <label th:text="#{invitation.confirm}"></label>
+      <input type="password" name="confirmation" minlength="8" required>
+      <p><button type="submit" th:text="#{invitation.submit}"></button></p>
+    </form>
+  </div>
+</main>
+</body>
+</html>

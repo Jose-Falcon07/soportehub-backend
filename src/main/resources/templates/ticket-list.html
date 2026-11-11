@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{${titleKey}})}"></head>
+<body>
+<nav th:replace="~{fragments :: menu}"></nav>
+<main>
+  <h1 th:text="#{${titleKey}}"></h1>
+
+  <form method="get" th:action="@{${basePath}}">
+    <label th:text="#{list.filter.status}"></label>
+    <select name="status">
+      <option value="" th:text="#{list.filter.all}"></option>
+      <option th:each="s : ${statuses}" th:value="${s}" th:text="#{${'status.' + s}}"
+              th:selected="${s.name() == status}"></option>
+    </select>
+    <input type="hidden" name="size" th:value="${size}">
+    <button type="submit" th:text="#{list.filter.apply}"></button>
+  </form>
+
+  <p th:if="${result.content().isEmpty()}" th:text="#{list.empty}"></p>
+
+  <table th:unless="${result.content().isEmpty()}">
+    <tr>
+      <th th:text="#{list.col.number}"></th><th th:text="#{list.col.subject}"></th>
+      <th th:text="#{list.col.category}"></th><th th:text="#{list.col.status}"></th>
+      <th th:text="#{list.col.priority}"></th><th th:text="#{list.col.agent}"></th>
+      <th th:text="#{list.col.due}"></th>
+    </tr>
+    <tr th:each="t : ${result.content()}">
+      <td th:text="${t.number()}"></td>
+      <td><a th:href="@{/tickets/{id}(id=${t.id()})}" th:text="${t.subject()}"></a></td>
+      <td th:text="${t.category()}"></td>
+      <td th:text="#{${'status.' + t.status()}}"></td>
+      <td th:text="#{${'priority.' + t.priority()}}"></td>
+      <td th:text="${t.agentName() != null} ? ${t.agentName()} : #{list.unassigned}"></td>
+      <td>
+        <span th:text="${t.dueAt()}"></span>
+        <span class="overdue" th:if="${t.overdue()}" th:text="#{list.overdue}"></span>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Los enlaces de paginación CONSERVAN el filtro de estado -->
+  <nav class="pages" th:if="${result.totalPages() > 1}">
+    <a th:each="p : ${#numbers.sequence(0, result.totalPages() - 1)}"
+       th:href="@{${basePath}(status=${status != null ? status : ''}, page=${p}, size=${size})}"
+       th:text="${p + 1}" th:classappend="${p == result.page()} ? 'current'"></a>
+  </nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: soportehub
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/soportehub}
+    #username: ${DB_USER}
+    #password: ${DB_PASSWORD}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none        # el esquema lo manejan SOLO las migraciones de Flyway
+  flyway:
+    enabled: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
+app:
+  base-url: ${APP_BASE_URL:http://localhost:8080}
+  cookie-secure: ${COOKIE_SECURE:false}     # true en el entorno desplegado (HTTPS)
+  jwt:
+    secret: ${JWT_SECRET}                   # mínimo 32 caracteres, NUNCA en el repositorio
+    expiration-minutes: 60
+  resend:
+    api-key: ${RESEND_API_KEY:}
+    from: ${RESEND_FROM:SoporteHub <onboarding@resend.dev>}
