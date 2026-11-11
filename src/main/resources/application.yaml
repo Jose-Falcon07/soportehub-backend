@@ -17,3 +17,9 @@ spring:
 
 server:
   port: 8080
+
+logging:
+  level:
+    org.springframework.security.web.csrf: TRACE
+    org.springframework.security.web.authentication: DEBUG
+    org.springframework.security.web.session: TRACE

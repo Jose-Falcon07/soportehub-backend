@@ -1,10 +1,7 @@
 <form th:action="@{/organizations}" method="post">
 
     <!-- Se tiene que declarar explicitamente el token de CSRF -->
-    <input type="hidden"
-           th:name="${_csrf.parameterName}"
-           th:value="${_csrf.token}" />
-
+     
     <label th:text="#{org.name}"></label>
     <input type="text" name="name" required>
 

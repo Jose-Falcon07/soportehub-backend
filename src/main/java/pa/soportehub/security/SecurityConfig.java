@@ -50,7 +50,16 @@ public class SecurityConfig {
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/invitation/**", "/error", "/css/**", "/api/auth/login").permitAll()
+                .requestMatchers(
+                    "/login",
+                    "/invitation/**",
+                    "/error",
+                    "/css/**",
+                    "/js/**",
+                    "/images/**",
+                    "/favicon.ico",
+                    "/api/auth/login"
+                ).permitAll()
                 .anyRequest().authenticated())
             .exceptionHandling(ex -> ex
                 // Deja en la consola el MOTIVO de cada 403 (CSRF inválido, rol insuficiente, etc.)
@@ -59,10 +68,16 @@ public class SecurityConfig {
                 .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
                         request -> request.getRequestURI().startsWith("/api/"))
                 .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
-            .addFilterAfter(new CsrfCookieFilter(),CsrfFilter.class //esto ejecuta el filtro despues de que se genere el token
-)           .addFilterBefore(new JwtAuthenticationFilter(jwtService, revocations),
+            .addFilterAfter(
+                new CsrfCookieFilter(),
+                CsrfFilter.class
+            )
+            .addFilterBefore(
+                new JwtAuthenticationFilter(jwtService, revocations),
                 UsernamePasswordAuthenticationFilter.class
-);          return http.build();
+            );
+
+            return http.build();
     }
 
     @Bean
