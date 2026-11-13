@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: backend
+spring:
+  application:
+    name: backend
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    url: jdbc:postgresql://localhost:${DB_PORT:5433}/${DB_NAME:soportehub}
+    username: ${DB_USER:soportehub}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: false
