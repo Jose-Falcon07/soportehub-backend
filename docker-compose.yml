@@ -1,36 +1,137 @@
+# ============================================================
+# Entorno de DESARROLLO local (perfil Spring `dev`)
+#   docker compose -f docker-compose.dev.yml up -d --build
+# ============================================================
+# Nota: la clave `version:` se eliminó — es obsoleta en Compose v2+
+# y solo produce el warning "the attribute `version` is obsolete".
+
+# Nombre de proyecto explícito. Sin él, Compose lo deriva del directorio
+# (`smartfinance-api`) y este stack y el de prod acababan compartiendo los
+# MISMOS volúmenes (`smartfinance-api_postgres_data`) y la misma red. Como cada
+# compose inicializa Postgres con un POSTGRES_USER distinto (`root` aquí,
+# `smartfinance` en prod), el segundo stack en arrancar reutilizaba el cluster
+# del primero y el backend moría con "password authentication failed".
+# Con `name:` los volúmenes pasan a ser `soportehub-dev_*` y quedan aislados.
+name: soportehub-dev
+
 services:
-  db:
-    image: postgres:17
-    container_name: soportehub-db
+
+  soportehub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    # Sufijo `_dev` en los tres contenedores: los `container_name` son globales
+    # del daemon (no los namespacea el nombre de proyecto), así que sin esto el
+    # stack de prod chocaba con "container name is already in use".
+    container_name: soportehub_api_dev
+
+    restart: unless-stopped
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    env_file:
+      - .env
+
+    ports:
+      - "8081:8081"
+
     environment:
+     # SPRING_PROFILES_ACTIVE: dev
+      # El .env trae PORT=8081; se fija aquí también para que el HEALTHCHECK
+      # del Dockerfile sondee el mismo puerto publicado arriba.
+      PORT: 8081
+
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "${DB_PORT}:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
-  flyway:
-    image: flyway/flyway:latest
-    container_name: soportehub-flyway
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
       FLYWAY_URL: jdbc:postgresql://db:5432/${DB_NAME}
       FLYWAY_USER: ${DB_USER}
       FLYWAY_PASSWORD: ${DB_PASSWORD}
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+    networks:
+      - soportehub
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: soportehub_db_dev
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-soportehub_db}
+      POSTGRES_USER: ${POSTGRES_USER:-root}
+      # Con `${POSTGRES_PASSWORD}` sin default y la variable ausente del .env,
+      # Postgres abortaba el arranque: "Database is uninitialized and superuser
+      # password is not specified".
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-soportehub123}
+
+    # 5433 en el host: prod publica el 5432 y ambos stacks deben poder correr a
+    # la vez. Dentro de la red de Compose el backend sigue hablando al 5432.
+    ports:
+      - "5433:5432"
+
     volumes:
-      - ./src/main/resources/db/migration:/flyway/sql
-      - ./docker/flyway/flyway.conf:/flyway/conf/flyway.conf:ro
-    command: migrate
+      - soportehub_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-root} -d ${POSTGRES_DB:-soportehub_db}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - soportehub
+
+  redis:
+    image: redis:7-alpine
+    container_name: soportehub_redis_dev
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    volumes:
+      - soportehub_redis_data:/data
+
+    # Antes era `condition: service_started`: la app arrancaba contra un Redis
+    # que aún no aceptaba conexiones.
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - soportehub
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: soportehub_pgadmin
+    restart: unless-stopped
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@soportehub.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+
+    ports:
+      - "5050:80"
+
+    depends_on:
+      - postgres
+
+    networks:
+      - soportehub
 
 volumes:
-  pgdata:
+  soportehub_postgres_data:
+  soportehub_redis_data:
+  #soportehub_uploads_data:
+
+networks:
+  soportehub:
