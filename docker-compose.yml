@@ -1,17 +1,4 @@
-# ============================================================
-# Entorno de DESARROLLO local (perfil Spring `dev`)
-#   docker compose -f docker-compose.dev.yml up -d --build
-# ============================================================
-# Nota: la clave `version:` se eliminó — es obsoleta en Compose v2+
-# y solo produce el warning "the attribute `version` is obsolete".
 
-# Nombre de proyecto explícito. Sin él, Compose lo deriva del directorio
-# (`smartfinance-api`) y este stack y el de prod acababan compartiendo los
-# MISMOS volúmenes (`smartfinance-api_postgres_data`) y la misma red. Como cada
-# compose inicializa Postgres con un POSTGRES_USER distinto (`root` aquí,
-# `smartfinance` en prod), el segundo stack en arrancar reutilizaba el cluster
-# del primero y el backend moría con "password authentication failed".
-# Con `name:` los volúmenes pasan a ser `soportehub-dev_*` y quedan aislados.
 name: soportehub-dev
 
 services:
@@ -21,9 +8,7 @@ services:
       context: .
       dockerfile: Dockerfile
 
-    # Sufijo `_dev` en los tres contenedores: los `container_name` son globales
-    # del daemon (no los namespacea el nombre de proyecto), así que sin esto el
-    # stack de prod chocaba con "container name is already in use".
+
     container_name: soportehub_api_dev
 
     restart: unless-stopped
@@ -131,7 +116,7 @@ services:
 volumes:
   soportehub_postgres_data:
   soportehub_redis_data:
-  #soportehub_uploads_data:
+
 
 networks:
   soportehub:
