@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Registro de auditoría: no tiene setters y nunca se modifica. */
+
 @Entity
 @Table(name = "ticket_status_history")
 public class TicketStatusHistory {

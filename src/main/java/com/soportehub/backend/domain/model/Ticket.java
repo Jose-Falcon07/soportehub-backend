@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Agregado Ticket. Fíjate que NO existe setStatus: el estado solo cambia por los métodos del negocio,
+ * Agregado Ticket. El estado solo cambia por los métodos del negocio,
  * y todos pasan por moveTo(), que valida la transición y escribe el historial.
  */
 @Entity

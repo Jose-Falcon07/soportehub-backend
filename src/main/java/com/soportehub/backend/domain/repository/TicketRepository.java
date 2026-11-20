@@ -4,7 +4,7 @@ import com.soportehub.backend.domain.model.Ticket;
 import java.util.Optional;
 import java.util.UUID;
 
-/** Patrón Repository: el dominio solo conoce esta interfaz; la implementación vive en infraestructura. */
+/** El dominio solo conoce esta interfaz; la implementación vive en infraestructura. */
 public interface TicketRepository {
 
     Ticket save(Ticket ticket);
