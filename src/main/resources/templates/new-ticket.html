@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head(#{ticket.new.title})}"></head>
+
+<body>
+  <nav th:replace="~{fragments :: menu}"></nav>
+  <main>
+    <h1 th:text="#{ticket.new.title}"></h1>
+    <div class="card">
+      <form th:action="@{/tickets}" method="post">
+        <label th:text="#{ticket.new.category}"></label>
+        <select name="categoryId" required>
+          <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"></option>
+        </select>
+        <label th:text="#{ticket.new.priority}"></label>
+        <select name="priority">
+          <option th:each="p : ${priorities}" th:value="${p}" th:text="#{${'priority.' + p}}"
+            th:selected="${p.name() == 'MEDIUM'}"></option>
+        </select>
+        <label th:text="#{ticket.new.subject}"></label>
+        <input name="subject" maxlength="200" required style="width:100%">
+        <label th:text="#{ticket.new.description}"></label>
+        <textarea name="description" maxlength="4000" rows="6" required style="width:100%"></textarea>
+        <p><button type="submit" th:text="#{ticket.new.submit}"></button></p>
+      </form>
+    </div>
+  </main>
+</body>
+
+</html>
