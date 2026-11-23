@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments :: head('Ticket')}"></head>
+
+<body>
+  <nav th:replace="~{fragments :: menu}"></nav>
+  <main>
+    <div class="card">
+      <h1>#<span th:text="${d.number()}"></span> · <span th:text="${d.subject()}"></span></h1>
+      <p>
+        <strong th:text="#{${'status.' + d.status()}}"></strong> ·
+        <span th:text="#{${'priority.' + d.priority()}}"></span> ·
+        <span th:text="${d.category()}"></span> ·
+        <span th:text="${d.dueAt()}"></span>
+        <span class="overdue" th:if="${d.overdue()}" th:text="#{list.overdue}"></span>
+      </p>
+      <p><span th:text="#{ticket.detail.requester}"></span>: <span th:text="${d.requesterName()}"></span>
+        · <span th:text="#{list.col.agent}"></span>:
+        <span th:text="${d.agentName() != null} ? ${d.agentName()} : #{list.unassigned}"></span>
+      </p>
+      <p th:text="${d.description()}"></p>
+    </div>
+
+    <!-- Acciones. OJO: ocultarlas es solo comodidad; el servidor vuelve a comprobar el permiso. -->
+    <div class="card" sec:authorize="hasAnyRole('COMPANY_ADMIN','SUPERVISOR')">
+      <h3 th:text="#{ticket.detail.assign}"></h3>
+      <form th:action="@{/tickets/{id}/assign(id=${d.id()})}" method="post">
+        <select name="agentId" required>
+          <option th:each="a : ${agents}" th:value="${a.id}" th:text="${a.fullName}"></option>
+        </select>
+        <input name="reason" th:placeholder="#{ticket.detail.reason}" required>
+        <button type="submit" th:text="#{ticket.detail.confirm}"></button>
+      </form>
+    </div>
+
+    <div class="card" sec:authorize="hasAnyRole('SUPERVISOR','AGENT')" th:if="${!d.allowedNext().isEmpty()}">
+      <h3 th:text="#{ticket.detail.changeStatus}"></h3>
+      <form th:action="@{/tickets/{id}/status(id=${d.id()})}" method="post">
+        <select name="target">
+          <option th:each="s : ${d.allowedNext()}" th:value="${s}" th:text="#{${'status.' + s}}"></option>
+        </select>
+        <input name="reason" th:placeholder="#{ticket.detail.reason}">
+        <button type="submit" th:text="#{ticket.detail.confirm}"></button>
+      </form>
+    </div>
+
+    <div class="card" sec:authorize="hasAnyRole('COMPANY_ADMIN','SUPERVISOR','REQUESTER')"
+      th:if="${d.status() == 'RESOLVED'}">
+      <form th:action="@{/tickets/{id}/reopen(id=${d.id()})}" method="post">
+        <input name="reason" th:placeholder="#{ticket.detail.reason}">
+        <button type="submit" th:text="#{ticket.detail.reopen}"></button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3 th:text="#{ticket.detail.comments}"></h3>
+      <p th:each="c : ${d.comments()}">
+        <strong th:text="${c.author()}"></strong> <small th:text="${c.createdAt()}"></small>
+        <em th:if="${c.internal()}" th:text="'(' + #{ticket.detail.internal} + ')'"></em><br>
+        <span th:text="${c.body()}"></span>
+      </p>
+      <form sec:authorize="hasAnyRole('SUPERVISOR','AGENT','REQUESTER')"
+        th:action="@{/tickets/{id}/comments(id=${d.id()})}" method="post">
+        <textarea name="body" rows="3" style="width:100%" required></textarea>
+        <label sec:authorize="hasAnyRole('SUPERVISOR','AGENT')">
+          <input type="checkbox" name="internal" value="true"> <span th:text="#{ticket.detail.internal}"></span>
+        </label>
+        <button type="submit" th:text="#{ticket.detail.addComment}"></button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3 th:text="#{ticket.detail.history}"></h3>
+      <table>
+        <tr th:each="h : ${d.history()}">
+          <td th:text="${h.at()}"></td>
+          <td th:text="${h.user()}"></td>
+          <td th:text="${h.from() != null} ? #{${'status.' + h.from()}} : '—'"></td>
+          <td th:text="#{${'status.' + h.to()}}"></td>
+          <td th:text="${h.reason()}"></td>
+        </tr>
+      </table>
+    </div>
+  </main>
+</body>
+
+</html>
