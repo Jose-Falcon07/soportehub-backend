@@ -1,5 +1,6 @@
 package com.soportehub.backend.infrastructure.redis;
 
+import tools.jackson.core.type.TypeReference;
 import java.time.Duration;
 import java.util.Set;
 import java.util.UUID;
