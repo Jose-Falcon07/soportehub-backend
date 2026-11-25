@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soportehub.backend.application.dto.query.PageResult;
 import com.soportehub.backend.application.dto.query.TicketSummaryView;
-
-import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class InboxCache {
@@ -49,6 +49,17 @@ public class InboxCache {
       log.warn("No se pudo guardar en la caché: {}", e.getMessage());
     }
     return result;
+  }
+
+  public void invalidateTicketListCache() {
+    try {
+      Set<String> keys = redis.keys("sh:*:inbox:*");
+      if (keys != null && !keys.isEmpty()) {
+        redis.delete(keys);
+      }
+    } catch (Exception e) {
+      log.warn("No se pudo invalidar la caché de bandejas: {}", e.getMessage());
+    }
   }
 
   public void evictOrganization(UUID org) {
