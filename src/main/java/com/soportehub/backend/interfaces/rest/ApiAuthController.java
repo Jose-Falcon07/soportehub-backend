@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Misma autenticación pero para Postman/Bruno: devuelve el token en el cuerpo (y también pone la cookie). */
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 public class ApiAuthController {
 
     public record LoginRequest(String email, String password) {

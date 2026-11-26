@@ -18,7 +18,7 @@ public class TicketCacheInvalidationHandler {
 
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void on(TicketChangedEvent event) {
-    cache.invalidateTicketListCache();
+      cache.evictOrganization(event.organizationId());
   }
 
 }

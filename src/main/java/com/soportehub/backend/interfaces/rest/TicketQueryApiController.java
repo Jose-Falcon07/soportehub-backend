@@ -18,7 +18,7 @@ import com.soportehub.backend.application.service.query.QueueQueryHandler;
 import com.soportehub.backend.application.service.query.TicketDetailQueryHandler;
 
 @RestController
-@RequestMapping("/api/V1/ tickets")
+@RequestMapping("/api/v1/tickets")
 public class TicketQueryApiController {
 
   private final AgentInboxQueryHandler inbox;
