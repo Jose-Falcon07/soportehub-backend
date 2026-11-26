@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head(#{settings.title})}"></head>
+
+<body>
+  <nav th:replace="~{fragments :: menu}"></nav>
+  <main>
+    <h1 th:text="#{settings.title}"></h1>
+
+    <div class="card">
+      <h2 th:text="#{settings.categories}"></h2>
+      <ul>
+        <li th:each="c : ${categories}" th:text="${c.name}"></li>
+      </ul>
+      <form th:action="@{/settings/categories}" method="post">
+        <input name="name" required>
+        <button type="submit" th:text="#{settings.addCategory}"></button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2 th:text="#{settings.sla}"></h2>
+      <form th:each="p : ${priorities}" th:action="@{/settings/sla}" method="post">
+        <input type="hidden" name="priority" th:value="${p}">
+        <span th:text="#{${'priority.' + p}}"></span>
+        <input type="number" name="hours" min="1" required>
+        <button type="submit" th:text="#{settings.save}"></button>
+      </form>
+      <ul>
+        <li th:each="s : ${slaPolicies}" th:text="${s.priority} + ': ' + ${s.hoursToResolve} + ' h'"></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2 th:text="#{settings.strategy}"></h2>
+      <form th:action="@{/settings/strategy}" method="post">
+        <select name="code">
+          <option value="MANUAL" th:selected="${strategy == 'MANUAL'}">Manual</option>
+          <option value="ROUND_ROBIN" th:selected="${strategy == 'ROUND_ROBIN'}">Turno rotativo</option>
+          <option value="LEAST_LOADED" th:selected="${strategy == 'LEAST_LOADED'}">Menor carga</option>
+        </select>
+        <button type="submit" th:text="#{settings.save}"></button>
+      </form>
+    </div>
+  </main>
+</body>
+
+</html>
