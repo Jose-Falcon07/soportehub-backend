@@ -1,25 +1,39 @@
-spring:
-  application:
-    name: backend
-
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-
-  flyway:
-    enabled: true
-
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6380}
-
 server:
   port: ${PORT:8081}
 
+spring:
+  application:
+    name: soportehub
+  datasource:
+    # Dentro de Docker: DB_HOST=postgres y DB_PORT=5432 (vienen del .env).
+    # En el IDE: DB_HOST=localhost y DB_PORT=5433 (puerto que Docker Compose publica en tu máquina).
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none        # el esquema lo manejan SOLO las migraciones de Flyway
+  flyway:
+    enabled: true           # usa el mismo datasource de arriba (las variables FLYWAY_* del compose no se leen)
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}     # en Docker el compose lo fija en "redis"
+      port: ${REDIS_PORT:6380}          # 6380 = puerto publicado en tu máquina; en Docker el compose lo fija en 6379
+      password: ${REDIS_PASSWORD:}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
 app:
+  base-url: ${APP_BASE_URL:http://localhost:8081}
+  cookie-secure: ${COOKIE_SECURE:false}     # true en el entorno desplegado (HTTPS)
   jwt:
-    secret: ${JWT_SECRET}
+    secret: ${JWT_SECRET}                   # mínimo 32 caracteres, NUNCA en el repositorio
     expiration-minutes: 60
+  resend:
+    api-key: ${RESEND_API_KEY:}
+    from: ${RESEND_FROM:SoporteHub <onboarding@resend.dev>}

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{login.title})}"></head>
+<body>
+<main>
+  <div class="card">
+    <h1 th:text="#{login.title}"></h1>
+    <p class="ok" th:if="${param.activated}" th:text="#{login.activated}"></p>
+    <p class="error" th:if="${error}" th:text="${error}"></p>
+    <form th:action="@{/login}" method="post">
+      <label th:text="#{login.email}"></label>
+      <input type="email" name="email" required>
+      <label th:text="#{login.password}"></label>
+      <input type="password" name="password" required>
+      <p><button type="submit" th:text="#{login.submit}"></button></p>
+    </form>
+  </div>
+</main>
+</body>
+</html>

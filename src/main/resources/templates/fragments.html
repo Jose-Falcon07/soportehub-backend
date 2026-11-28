@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${title} + ' · ' + #{app.name}">SoporteHub</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<!-- El menú cambia según el rol, pero OJO: ocultar un botón NO es seguridad; el servidor vuelve a comprobar. -->
+<nav th:fragment="menu" class="menu">
+  <strong th:text="#{app.name}">SoporteHub</strong>
+  <a sec:authorize="hasRole('SUPER_ADMIN')" th:href="@{/organizations}" th:text="#{menu.organizations}"></a>
+  <a sec:authorize="hasAnyRole('COMPANY_ADMIN','SUPERVISOR','AGENT')" th:href="@{/inbox}" th:text="#{menu.inbox}"></a>
+  <a sec:authorize="hasAnyRole('COMPANY_ADMIN','SUPERVISOR')" th:href="@{/queue}" th:text="#{menu.queue}"></a>
+  <a sec:authorize="hasRole('REQUESTER')" th:href="@{/my-tickets}" th:text="#{menu.myTickets}"></a>
+  <a sec:authorize="hasAnyRole('COMPANY_ADMIN','SUPERVISOR','AGENT','REQUESTER')" th:href="@{/tickets/new}" th:text="#{menu.newTicket}"></a>
+  <a sec:authorize="hasRole('COMPANY_ADMIN')" th:href="@{/users}" th:text="#{menu.users}"></a>
+  <a sec:authorize="hasRole('COMPANY_ADMIN')" th:href="@{/settings}" th:text="#{menu.settings}"></a>
+  <form th:action="@{/logout}" method="post"><button type="submit" th:text="#{menu.logout}"></button></form>
+</nav>
+</body>
+</html>

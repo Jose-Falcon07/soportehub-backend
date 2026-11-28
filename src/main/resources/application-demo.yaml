@@ -1,0 +1,5 @@
+# Solo con el perfil "demo": muestra en consola POR QUÉ Spring Security rechaza una petición
+# (busca líneas como "Invalid CSRF token found" o "Access Denied").
+logging:
+  level:
+    org.springframework.security: DEBUG

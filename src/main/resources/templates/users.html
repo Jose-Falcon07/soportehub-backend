@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{users.title})}"></head>
+<body>
+<nav th:replace="~{fragments :: menu}"></nav>
+<main>
+  <h1 th:text="#{users.title}"></h1>
+  <div class="card">
+    <h2 th:text="#{users.invite}"></h2>
+    <form th:action="@{/users}" method="post">
+      <label th:text="#{users.name}"></label><input name="fullName" required>
+      <label th:text="#{users.email}"></label><input type="email" name="email" required>
+      <label th:text="#{users.role}"></label>
+      <select name="role"><option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option></select>
+      <p><button type="submit" th:text="#{users.invite}"></button></p>
+    </form>
+  </div>
+  <table>
+    <tr><th th:text="#{users.name}"></th><th th:text="#{users.email}"></th><th th:text="#{users.role}"></th><th th:text="#{users.status}"></th></tr>
+    <tr th:each="u : ${users}">
+      <td th:text="${u.fullName}"></td><td th:text="${u.email}"></td>
+      <td th:text="${u.roleNames}"></td><td th:text="${u.status}"></td>
+    </tr>
+  </table>
+</main>
+</body>
+</html>

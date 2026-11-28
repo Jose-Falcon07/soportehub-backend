@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{org.title})}"></head>
+<body>
+<nav th:replace="~{fragments :: menu}"></nav>
+<main>
+  <h1 th:text="#{org.title}"></h1>
+  <div class="card">
+    <form th:action="@{/organizations}" method="post">
+      <label th:text="#{org.name}"></label><input name="name" required>
+      <label th:text="#{org.adminName}"></label><input name="adminName" required>
+      <label th:text="#{org.adminEmail}"></label><input type="email" name="adminEmail" required>
+      <p><button type="submit" th:text="#{org.create}"></button></p>
+    </form>
+  </div>
+  <table>
+    <tr><th th:text="#{org.name}"></th><th>Activa</th></tr>
+    <tr th:each="o : ${organizations}"><td th:text="${o.name}"></td><td th:text="${o.active}"></td></tr>
+  </table>
+</main>
+</body>
+</html>
